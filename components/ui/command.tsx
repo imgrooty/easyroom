@@ -1,155 +1,152 @@
 'use client';
 
 import * as React from 'react';
-import { type DialogProps } from '@radix-ui/react-dialog';
-import { Command as CommandPrimitive } from 'cmdk';
-import { Search } from 'lucide-react';
-
+import {
+  KBarProvider,
+  KBarPortal,
+  KBarPositioner,
+  KBarAnimator,
+  KBarSearch,
+  useMatches,
+  KBarResults,
+  NO_GROUP,
+  ActionImpl,
+} from 'kbar';
 import { cn } from '@/lib/utils';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
 
-const Command = React.forwardRef<
-  React.ElementRef<typeof CommandPrimitive>,
-  React.ComponentPropsWithoutRef<typeof CommandPrimitive>
->(({ className, ...props }, ref) => (
-  <CommandPrimitive
-    ref={ref}
-    className={cn(
-      'flex h-full w-full flex-col overflow-hidden rounded-md bg-popover text-popover-foreground',
-      className
-    )}
-    {...props}
-  />
-));
-Command.displayName = CommandPrimitive.displayName;
+const searchStyle = {
+  padding: '12px 16px',
+  fontSize: '16px',
+  width: '100%',
+  boxSizing: 'border-box' as const,
+  outline: 'none',
+  border: 'none',
+  background: 'var(--background)',
+  color: 'var(--foreground)',
+};
 
-interface CommandDialogProps extends DialogProps {}
+const animatorStyle = {
+  maxWidth: '600px',
+  width: '100%',
+  background: 'var(--background)',
+  color: 'var(--foreground)',
+  borderRadius: '8px',
+  overflow: 'hidden',
+  boxShadow: 'var(--shadow)',
+};
 
-const CommandDialog = ({ children, ...props }: CommandDialogProps) => {
+const groupNameStyle = {
+  padding: '8px 16px',
+  fontSize: '10px',
+  textTransform: 'uppercase' as const,
+  opacity: 0.5,
+};
+
+interface Action {
+  id: string;
+  name: string;
+  shortcut?: string[];
+  keywords?: string;
+  section?: string;
+  perform?: () => void;
+  subtitle?: string;
+  icon?: React.ReactNode;
+}
+
+const CommandPalette = ({ children, actions }: { children?: React.ReactNode; actions: Action[] }) => {
   return (
-    <Dialog {...props}>
-      <DialogContent className="overflow-hidden p-0 shadow-lg">
-        <Command className="[&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-muted-foreground [&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0 [&_[cmdk-group]]:px-2 [&_[cmdk-input-wrapper]_svg]:h-5 [&_[cmdk-input-wrapper]_svg]:w-5 [&_[cmdk-input]]:h-12 [&_[cmdk-item]]:px-2 [&_[cmdk-item]]:py-3 [&_[cmdk-item]_svg]:h-5 [&_[cmdk-item]_svg]:w-5">
-          {children}
-        </Command>
-      </DialogContent>
-    </Dialog>
+    <KBarProvider actions={actions}>
+      <KBarPortal>
+        <KBarPositioner className="bg-background/80 backdrop-blur-sm">
+          <KBarAnimator style={animatorStyle}>
+            <KBarSearch style={searchStyle} placeholder="Type a command or search..." />
+            <RenderResults />
+          </KBarAnimator>
+        </KBarPositioner>
+      </KBarPortal>
+      {children}
+    </KBarProvider>
   );
 };
 
-const CommandInput = React.forwardRef<
-  React.ElementRef<typeof CommandPrimitive.Input>,
-  React.ComponentPropsWithoutRef<typeof CommandPrimitive.Input>
->(({ className, ...props }, ref) => (
-  <div className="flex items-center border-b px-3" cmdk-input-wrapper="">
-    <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
-    <CommandPrimitive.Input
+function RenderResults() {
+  const { results, rootActionId } = useMatches();
+
+  return (
+    <KBarResults
+      items={results}
+      onRender={({ item, active }) =>
+        typeof item === 'string' ? (
+          <div style={groupNameStyle}>{item}</div>
+        ) : (
+          <ResultItem
+            action={item}
+            active={active}
+            currentRootActionId={rootActionId}
+          />
+        )
+      }
+    />
+  );
+}
+
+const ResultItem = React.forwardRef(({
+  action,
+  active,
+  currentRootActionId,
+}: {
+  action: ActionImpl;
+  active: boolean;
+  currentRootActionId: string | null | undefined;
+}, ref: React.Ref<HTMLDivElement>) => {
+  const ancestors = React.useMemo(() => {
+    if (!currentRootActionId) return action.ancestors;
+    const index = action.ancestors.findIndex((ancestor) => ancestor.id === currentRootActionId);
+    return action.ancestors.slice(index + 1);
+  }, [action.ancestors, currentRootActionId]);
+
+  return (
+    <div
       ref={ref}
       className={cn(
-        'flex h-11 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50',
-        className
+        "flex items-center justify-between px-4 py-2 cursor-pointer",
+        active && "bg-accent text-accent-foreground"
       )}
-      {...props}
-    />
-  </div>
-));
-
-CommandInput.displayName = CommandPrimitive.Input.displayName;
-
-const CommandList = React.forwardRef<
-  React.ElementRef<typeof CommandPrimitive.List>,
-  React.ComponentPropsWithoutRef<typeof CommandPrimitive.List>
->(({ className, ...props }, ref) => (
-  <CommandPrimitive.List
-    ref={ref}
-    className={cn('max-h-[300px] overflow-y-auto overflow-x-hidden', className)}
-    {...props}
-  />
-));
-
-CommandList.displayName = CommandPrimitive.List.displayName;
-
-const CommandEmpty = React.forwardRef<
-  React.ElementRef<typeof CommandPrimitive.Empty>,
-  React.ComponentPropsWithoutRef<typeof CommandPrimitive.Empty>
->((props, ref) => (
-  <CommandPrimitive.Empty
-    ref={ref}
-    className="py-6 text-center text-sm"
-    {...props}
-  />
-));
-
-CommandEmpty.displayName = CommandPrimitive.Empty.displayName;
-
-const CommandGroup = React.forwardRef<
-  React.ElementRef<typeof CommandPrimitive.Group>,
-  React.ComponentPropsWithoutRef<typeof CommandPrimitive.Group>
->(({ className, ...props }, ref) => (
-  <CommandPrimitive.Group
-    ref={ref}
-    className={cn(
-      'overflow-hidden p-1 text-foreground [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-muted-foreground',
-      className
-    )}
-    {...props}
-  />
-));
-
-CommandGroup.displayName = CommandPrimitive.Group.displayName;
-
-const CommandSeparator = React.forwardRef<
-  React.ElementRef<typeof CommandPrimitive.Separator>,
-  React.ComponentPropsWithoutRef<typeof CommandPrimitive.Separator>
->(({ className, ...props }, ref) => (
-  <CommandPrimitive.Separator
-    ref={ref}
-    className={cn('-mx-1 h-px bg-border', className)}
-    {...props}
-  />
-));
-CommandSeparator.displayName = CommandPrimitive.Separator.displayName;
-
-const CommandItem = React.forwardRef<
-  React.ElementRef<typeof CommandPrimitive.Item>,
-  React.ComponentPropsWithoutRef<typeof CommandPrimitive.Item>
->(({ className, ...props }, ref) => (
-  <CommandPrimitive.Item
-    ref={ref}
-    className={cn(
-      "relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none data-[disabled=true]:pointer-events-none data-[selected='true']:bg-accent data-[selected=true]:text-accent-foreground data-[disabled=true]:opacity-50",
-      className
-    )}
-    {...props}
-  />
-));
-
-CommandItem.displayName = CommandPrimitive.Item.displayName;
-
-const CommandShortcut = ({
-  className,
-  ...props
-}: React.HTMLAttributes<HTMLSpanElement>) => {
-  return (
-    <span
-      className={cn(
-        'ml-auto text-xs tracking-widest text-muted-foreground',
-        className
-      )}
-      {...props}
-    />
+    >
+      <div className="flex items-center gap-2 text-sm">
+        {action.icon && action.icon}
+        <div className="flex flex-col">
+          <div>
+            {ancestors.length > 0 &&
+              ancestors.map((ancestor) => (
+                <React.Fragment key={ancestor.id}>
+                  <span className="opacity-50 mr-2">{ancestor.name}</span>
+                  <span className="mr-2">&rsaquo;</span>
+                </React.Fragment>
+              ))}
+            <span>{action.name}</span>
+          </div>
+          {action.subtitle && (
+            <span className="text-xs opacity-50">{action.subtitle}</span>
+          )}
+        </div>
+      </div>
+      {action.shortcut?.length ? (
+        <div className="flex items-center gap-1">
+          {action.shortcut.map((sc: string) => (
+            <kbd
+              key={sc}
+              className="px-2 py-1 text-xs bg-muted rounded"
+            >
+              {sc}
+            </kbd>
+          ))}
+        </div>
+      ) : null}
+    </div>
   );
-};
-CommandShortcut.displayName = 'CommandShortcut';
+});
 
-export {
-  Command,
-  CommandDialog,
-  CommandInput,
-  CommandList,
-  CommandEmpty,
-  CommandGroup,
-  CommandItem,
-  CommandShortcut,
-  CommandSeparator,
-};
+ResultItem.displayName = "ResultItem";
+
+export { CommandPalette };
