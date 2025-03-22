@@ -39,7 +39,7 @@ export default function RoomDetailPage({ params }: { params: { id: string } }) {
     type: "Studio",
     size: "450 sq ft",
     rating: 4.9,
-    reviews: 124,
+    reviewCount: 124,
     images: [
       "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2340&q=80",
       "https://images.unsplash.com/photo-1598928506311-c55ded91a20c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2340&q=80",
@@ -165,7 +165,7 @@ export default function RoomDetailPage({ params }: { params: { id: string } }) {
                           className={`h-4 w-4 ${i < Math.floor(room.rating) ? "fill-yellow-400 text-yellow-400" : "text-muted-foreground"}`} 
                         />
                       ))}
-                      <span className="ml-1 text-sm">{room.rating} ({room.reviews.length} reviews)</span>
+                      <span className="ml-1 text-sm">{room.rating} ({room.reviewCount} reviews)</span>
                     </div>
                   </div>
                 </div>
@@ -270,7 +270,7 @@ export default function RoomDetailPage({ params }: { params: { id: string } }) {
                           ))}
                         </div>
                         <div className="text-sm text-muted-foreground mt-1">
-                          Based on {room.reviews.length} reviews
+                          Based on {room.reviewCount} reviews
                         </div>
                       </div>
                     </div>
