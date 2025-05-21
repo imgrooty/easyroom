@@ -89,6 +89,9 @@ easyroom/
 │   ├── utils.ts          # Helper functions
 │   └── validations/      # Zod schemas
 ├── public/               # Static assets
+│   ├── favicon.ico       # Favicon (multi-size)
+│   ├── icon.svg          # SVG icon
+│   └── manifest.json     # Web app manifest
 └── types/                # TypeScript type definitions
 ```
 
@@ -131,6 +134,8 @@ The application is designed to work seamlessly across all device sizes:
 - Desktop
 - Tablet
 - Mobile
+
+## 🌐 Favicon & PWA Suppor
 
 ## 🧪 Development
 

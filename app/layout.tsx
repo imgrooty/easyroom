@@ -11,11 +11,18 @@ export const metadata: Metadata = {
   title: 'EasyRooms | Find Your Perfect Room',
   description: 'Modern room finding and booking platform with AI-powered features',
   themeColor: [
-    { media: '(prefers-color-scheme: light)', color: 'white' },
-    { media: '(prefers-color-scheme: dark)', color: 'black' },
+    { media: '(prefers-color-scheme: light)', color: '#ffffff' },
+    { media: '(prefers-color-scheme: dark)', color: '#1e293b' },
   ],
+  manifest: '/manifest.json',
   icons: {
-    icon: '/favicon.ico',
+    icon: [
+      { url: '/favicon.ico', sizes: 'any' },
+      { url: '/icon.svg', type: 'image/svg+xml' },
+    ],
+    apple: [
+      { url: '/favicon.ico' },
+    ],
   },
 };
 
@@ -25,6 +32,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
+    // suppressHydrationWarning is needed because of next-auth session provider
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
         <AuthProvider>
