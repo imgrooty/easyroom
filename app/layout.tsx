@@ -10,6 +10,13 @@ const inter = Inter({ subsets: ['latin'] });
 export const metadata: Metadata = {
   title: 'EasyRooms | Find Your Perfect Room',
   description: 'Modern room finding and booking platform with AI-powered features',
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: 'white' },
+    { media: '(prefers-color-scheme: dark)', color: 'black' },
+  ],
+  icons: {
+    icon: '/easyroom.png',
+  },
 };
 
 export default function RootLayout({
