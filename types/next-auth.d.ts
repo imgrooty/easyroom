@@ -1,6 +1,6 @@
-import { UserRole } from "@prisma/client";
-
 declare module "next-auth" {
+  type UserRole = "TENANT" | "LANDLORD" | "ADMIN";
+
   interface Session {
     user: {
       id: string;
@@ -10,4 +10,4 @@ declare module "next-auth" {
       image?: string | null;
     }
   }
-} 
+}

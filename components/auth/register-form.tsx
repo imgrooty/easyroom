@@ -44,20 +44,11 @@ export function RegisterForm() {
   async function onSubmit(data: FormData) {
     setIsLoading(true);
 
-    const response = await fetch("/api/auth/register", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
-    });
-
+    // In frontend-only mode, we'll just simulate registration
+    // This function is kept for UI demonstration purposes
     setIsLoading(false);
 
-    if (!response?.ok) {
-      return toast.error("Something went wrong. Please try again.");
-    }
-
+    toast.info("This is a frontend-only demo. Registration is simulated.");
     toast.success("Account created successfully!");
     router.push("/auth/login");
   }
@@ -136,4 +127,4 @@ export function RegisterForm() {
       </Form>
     </div>
   );
-} 
+}

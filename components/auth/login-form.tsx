@@ -36,20 +36,11 @@ export function LoginForm() {
   async function onSubmit(data: FormData) {
     setIsLoading(true);
 
-    const signInResult = await signIn("credentials", {
-      email: data.email.toLowerCase(),
-      password: data.password,
-      redirect: false,
-    });
-
+    // In frontend-only mode, we'll just use Google auth
+    // This function is kept for UI demonstration purposes
     setIsLoading(false);
 
-    if (!signInResult?.ok) {
-      return toast.error("Invalid credentials");
-    }
-
-    router.refresh();
-    router.push("/dashboard");
+    toast.info("This is a frontend-only demo. Use Google sign-in instead.");
   }
 
   return (
@@ -115,4 +106,4 @@ export function LoginForm() {
       </Button>
     </div>
   );
-} 
+}
