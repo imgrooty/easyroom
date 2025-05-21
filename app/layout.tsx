@@ -15,7 +15,7 @@ export const metadata: Metadata = {
     { media: '(prefers-color-scheme: dark)', color: 'black' },
   ],
   icons: {
-    icon: '/easyroom.png',
+    icon: './easyroom.png',
   },
 };
 
