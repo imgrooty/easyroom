@@ -9,10 +9,18 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
+    async jwt({ token, user }) {
+      if (user) {
+        // Add role to the token when user signs in
+        token.role = "TENANT";
+      }
+      return token;
+    },
     async session({ session, token }) {
-      if (token.sub && session.user) {
-        // Mock user role for frontend-only implementation
-        session.user.role = "TENANT";
+      if (session.user) {
+        // Add role from token to the session
+        session.user.role = token.role as "TENANT" | "LANDLORD" | "ADMIN";
+        session.user.id = token.sub as string;
       }
       return session;
     },

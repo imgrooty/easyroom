@@ -48,7 +48,7 @@ export function SiteHeader() {
               {item.name}
             </Link>
           ))}
-          {session?.user?.role === "LANDLORD" && (
+          {session?.user && session.user.role === "LANDLORD" && (
             <Link
               href="/rooms/new"
               className="text-sm font-medium transition-colors hover:text-primary"
@@ -159,7 +159,7 @@ export function SiteHeader() {
                 {item.name}
               </Link>
             ))}
-            {session?.user?.role === "LANDLORD" && (
+            {session?.user && session.user.role === "LANDLORD" && (
               <Link
                 href="/rooms/new"
                 className="flex w-full items-center rounded-md p-2 text-sm font-medium hover:bg-accent"
